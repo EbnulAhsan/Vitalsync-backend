@@ -1,4 +1,5 @@
 import { prisma } from "../../config/prisma";
+import AppError from "../../error/AppError";
 
 type AddWaterPayload = {
     amountMl: number;
@@ -12,7 +13,7 @@ const addWater = async (userId: string, payload: AddWaterPayload) => {
     const amountMl = Number(payload.amountMl);
 
     if (!amountMl || amountMl <= 0) {
-        throw new Error("Valid amountMl is required");
+        throw new AppError(400, "Valid amountMl is required");
     }
 
     const waterRecord = await prisma.waterHistory.create({
