@@ -3,6 +3,7 @@ import cors from "cors";
 import authRoutes from "./modules/auth/auth.route";
 import profileRoutes from "./modules/profile/profile.route";
 import bmiRoutes from "./modules/bmi/bmi.route";
+import waterRoutes from "./modules/water/water.route";
 
 const app = express();
 
@@ -35,5 +36,6 @@ app.get("/health", (req, res) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/bmi", bmiRoutes);
+app.use("/api/v1/water", waterRoutes);
 
 export default app;
