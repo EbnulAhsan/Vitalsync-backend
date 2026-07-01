@@ -1,58 +1,40 @@
 import { Response } from "express";
 import { AuthRequest } from "../../middlewares/auth.middleware";
 import { BMIService } from "./bmi.service";
+import { catchAsync } from "../../utils/catchAsync";
+import AppError from "../../error/AppError";
 
-const calculateBMI = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
+const calculateBMI = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
-
-        const result = await BMIService.calculateBMI(userId, req.body);
-
-        res.status(201).json({
-            success: true,
-            message: "BMI calculated successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Failed to calculate BMI",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
 
-const getBMIHistory = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
+    const result = await BMIService.calculateBMI(userId, req.body);
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
+    return res.status(201).json({
+        success: true,
+        message: "BMI calculated successfully",
+        data: result,
+    });
+});
 
-        const result = await BMIService.getBMIHistory(userId);
+const getBMIHistory = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
 
-        res.status(200).json({
-            success: true,
-            message: "BMI history retrieved successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Failed to get BMI history",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
+
+    const result = await BMIService.getBMIHistory(userId);
+
+    return res.status(200).json({
+        success: true,
+        message: "BMI history retrieved successfully",
+        data: result,
+    });
+});
 
 export const BMIController = {
     calculateBMI,

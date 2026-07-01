@@ -1,16 +1,15 @@
 import { Response } from "express";
 import { AuthRequest } from "../../middlewares/auth.middleware";
 import { DashboardService } from "./dashboard.service";
+import { catchAsync } from "../../utils/catchAsync";
+import AppError from "../../error/AppError";
 
-const getDashboardSummary = async (req: AuthRequest, res: Response) => {
-    try {
+const getDashboardSummary = catchAsync(
+    async (req: AuthRequest, res: Response) => {
         const userId = req.user?.userId;
 
         if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
+            throw new AppError(401, "Unauthorized user");
         }
 
         const result = await DashboardService.getDashboardSummary(userId);
@@ -20,13 +19,8 @@ const getDashboardSummary = async (req: AuthRequest, res: Response) => {
             message: "Dashboard summary retrieved successfully",
             data: result,
         });
-    } catch (error: any) {
-        return res.status(400).json({
-            success: false,
-            message: error.message || "Failed to get dashboard summary",
-        });
     }
-};
+);
 
 export const DashboardController = {
     getDashboardSummary,

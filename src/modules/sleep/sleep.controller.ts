@@ -1,84 +1,56 @@
 import { Response } from "express";
 import { AuthRequest } from "../../middlewares/auth.middleware";
 import { SleepService } from "./sleep.service";
+import { catchAsync } from "../../utils/catchAsync";
+import AppError from "../../error/AppError";
 
-const addSleep = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
+const addSleep = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
-
-        const result = await SleepService.addSleep(userId, req.body);
-
-        res.status(201).json({
-            success: true,
-            message: "Sleep record added successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Failed to add sleep record",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
 
-const getSleepHistory = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
+    const result = await SleepService.addSleep(userId, req.body);
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
+    return res.status(201).json({
+        success: true,
+        message: "Sleep record added successfully",
+        data: result,
+    });
+});
 
-        const result = await SleepService.getSleepHistory(userId);
+const getSleepHistory = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
 
-        res.status(200).json({
-            success: true,
-            message: "Sleep history retrieved successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Failed to get sleep history",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
 
-const getTodaySleep = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
+    const result = await SleepService.getSleepHistory(userId);
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
+    return res.status(200).json({
+        success: true,
+        message: "Sleep history retrieved successfully",
+        data: result,
+    });
+});
 
-        const result = await SleepService.getTodaySleep(userId);
+const getTodaySleep = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
 
-        res.status(200).json({
-            success: true,
-            message: "Today sleep retrieved successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Failed to get today sleep",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
+
+    const result = await SleepService.getTodaySleep(userId);
+
+    return res.status(200).json({
+        success: true,
+        message: "Today sleep retrieved successfully",
+        data: result,
+    });
+});
 
 export const SleepController = {
     addSleep,

@@ -1,4 +1,5 @@
 import { prisma } from "../../config/prisma";
+import AppError from "../../error/AppError";
 
 type BMICategory = "UNDERWEIGHT" | "NORMAL" | "OVERWEIGHT" | "OBESE";
 
@@ -18,12 +19,12 @@ const calculateBMI = async (userId: string, payload: CalculateBMIPayload) => {
     const weightKg = Number(payload.weightKg);
 
     if (!weightKg || weightKg <= 0) {
-        throw new Error("Valid weightKg is required");
+        throw new AppError(400, "Valid weightKg is required");
     }
 
     let finalHeightCm: number;
 
-    if (payload.heightCm && payload.heightCm > 0) {
+    if (payload.heightCm && Number(payload.heightCm) > 0) {
         finalHeightCm = Number(payload.heightCm);
     } else {
         const profile = await prisma.profile.findUnique({
@@ -34,14 +35,17 @@ const calculateBMI = async (userId: string, payload: CalculateBMIPayload) => {
         });
 
         if (!profile || !profile.heightCm || profile.heightCm <= 0) {
-            throw new Error("heightCm is required. Please update profile height first.");
+            throw new AppError(
+                400,
+                "heightCm is required. Please update profile height first."
+            );
         }
 
         finalHeightCm = profile.heightCm;
     }
 
     if (finalHeightCm <= 0) {
-        throw new Error("Valid heightCm is required");
+        throw new AppError(400, "Valid heightCm is required");
     }
 
     const heightMeter = finalHeightCm / 100;

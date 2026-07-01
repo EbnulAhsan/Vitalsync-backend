@@ -1,84 +1,56 @@
 import { Response } from "express";
 import { AuthRequest } from "../../middlewares/auth.middleware";
 import { WaterService } from "./water.service";
+import { catchAsync } from "../../utils/catchAsync";
+import AppError from "../../error/AppError";
 
-const addWater = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
+const addWater = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
-
-        const result = await WaterService.addWater(userId, req.body);
-
-        res.status(201).json({
-            success: true,
-            message: "Water intake added successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Failed to add water intake",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
 
-const getWaterHistory = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
+    const result = await WaterService.addWater(userId, req.body);
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
+    return res.status(201).json({
+        success: true,
+        message: "Water intake added successfully",
+        data: result,
+    });
+});
 
-        const result = await WaterService.getWaterHistory(userId);
+const getWaterHistory = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
 
-        res.status(200).json({
-            success: true,
-            message: "Water history retrieved successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Failed to get water history",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
 
-const getTodayWater = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
+    const result = await WaterService.getWaterHistory(userId);
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
+    return res.status(200).json({
+        success: true,
+        message: "Water history retrieved successfully",
+        data: result,
+    });
+});
 
-        const result = await WaterService.getTodayWater(userId);
+const getTodayWater = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
 
-        res.status(200).json({
-            success: true,
-            message: "Today water intake retrieved successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Failed to get today water intake",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
+
+    const result = await WaterService.getTodayWater(userId);
+
+    return res.status(200).json({
+        success: true,
+        message: "Today water intake retrieved successfully",
+        data: result,
+    });
+});
 
 export const WaterController = {
     addWater,

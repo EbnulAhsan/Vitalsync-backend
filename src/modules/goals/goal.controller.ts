@@ -1,160 +1,103 @@
 import { Response } from "express";
 import { AuthRequest } from "../../middlewares/auth.middleware";
 import { GoalService } from "./goal.service";
+import { catchAsync } from "../../utils/catchAsync";
+import AppError from "../../error/AppError";
 
-const createGoal = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
+const createGoal = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
-
-        const result = await GoalService.createGoal(userId, req.body);
-
-        return res.status(201).json({
-            success: true,
-            message: "Goal created successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        return res.status(400).json({
-            success: false,
-            message: error.message || "Failed to create goal",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
 
-const getMyGoals = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
+    const result = await GoalService.createGoal(userId, req.body);
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
+    return res.status(201).json({
+        success: true,
+        message: "Goal created successfully",
+        data: result,
+    });
+});
 
-        const result = await GoalService.getMyGoals(userId);
+const getMyGoals = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
 
-        return res.status(200).json({
-            success: true,
-            message: "Goals retrieved successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        return res.status(400).json({
-            success: false,
-            message: error.message || "Failed to get goals",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
 
-const getGoalById = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
-        const goalId = req.params.id as string;
+    const result = await GoalService.getMyGoals(userId);
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
+    return res.status(200).json({
+        success: true,
+        message: "Goals retrieved successfully",
+        data: result,
+    });
+});
 
-        if (!goalId) {
-            return res.status(400).json({
-                success: false,
-                message: "Goal id is required",
-            });
-        }
+const getGoalById = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+    const goalId = req.params.id as string;
 
-        const result = await GoalService.getGoalById(userId, goalId);
-
-        return res.status(200).json({
-            success: true,
-            message: "Goal retrieved successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        return res.status(404).json({
-            success: false,
-            message: error.message || "Failed to get goal",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
 
-const updateGoal = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
-        const goalId = req.params.id as string;
-
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
-
-        if (!goalId) {
-            return res.status(400).json({
-                success: false,
-                message: "Goal id is required",
-            });
-        }
-
-        const result = await GoalService.updateGoal(userId, goalId, req.body);
-
-        return res.status(200).json({
-            success: true,
-            message: "Goal updated successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        return res.status(400).json({
-            success: false,
-            message: error.message || "Failed to update goal",
-        });
+    if (!goalId) {
+        throw new AppError(400, "Goal id is required");
     }
-};
 
-const deleteGoal = async (req: AuthRequest, res: Response) => {
-    try {
-        const userId = req.user?.userId;
-        const goalId = req.params.id as string;
+    const result = await GoalService.getGoalById(userId, goalId);
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized user",
-            });
-        }
+    return res.status(200).json({
+        success: true,
+        message: "Goal retrieved successfully",
+        data: result,
+    });
+});
 
-        if (!goalId) {
-            return res.status(400).json({
-                success: false,
-                message: "Goal id is required",
-            });
-        }
+const updateGoal = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+    const goalId = req.params.id as string;
 
-        await GoalService.deleteGoal(userId, goalId);
-
-        return res.status(200).json({
-            success: true,
-            message: "Goal deleted successfully",
-            data: null,
-        });
-    } catch (error: any) {
-        return res.status(400).json({
-            success: false,
-            message: error.message || "Failed to delete goal",
-        });
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
     }
-};
+
+    if (!goalId) {
+        throw new AppError(400, "Goal id is required");
+    }
+
+    const result = await GoalService.updateGoal(userId, goalId, req.body);
+
+    return res.status(200).json({
+        success: true,
+        message: "Goal updated successfully",
+        data: result,
+    });
+});
+
+const deleteGoal = catchAsync(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+    const goalId = req.params.id as string;
+
+    if (!userId) {
+        throw new AppError(401, "Unauthorized user");
+    }
+
+    if (!goalId) {
+        throw new AppError(400, "Goal id is required");
+    }
+
+    await GoalService.deleteGoal(userId, goalId);
+
+    return res.status(200).json({
+        success: true,
+        message: "Goal deleted successfully",
+        data: null,
+    });
+});
 
 export const GoalController = {
     createGoal,

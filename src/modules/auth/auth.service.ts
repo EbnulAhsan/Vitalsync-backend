@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { prisma } from "../../config/prisma";
+import AppError from "../../error/AppError";
 
 type RegisterPayload = {
     fullName?: string;
@@ -21,7 +22,7 @@ const registerUser = async (payload: RegisterPayload) => {
     });
 
     if (existingUser) {
-        throw new Error("User already exists with this email");
+        throw new AppError(400, "User already exists with this email");
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
@@ -62,13 +63,17 @@ const loginUser = async (payload: LoginPayload) => {
     });
 
     if (!user) {
-        throw new Error("Invalid email or password");
+        throw new AppError(401, "Invalid email or password");
     }
 
     const isPasswordMatched = await bcrypt.compare(password, user.passwordHash);
 
     if (!isPasswordMatched) {
-        throw new Error("Invalid email or password");
+        throw new AppError(401, "Invalid email or password");
+    }
+
+    if (!process.env.JWT_ACCESS_SECRET) {
+        throw new AppError(500, "JWT access secret is not configured");
     }
 
     const accessToken = jwt.sign(
@@ -77,7 +82,7 @@ const loginUser = async (payload: LoginPayload) => {
             email: user.email,
             role: user.role,
         },
-        process.env.JWT_ACCESS_SECRET as string,
+        process.env.JWT_ACCESS_SECRET,
         {
             expiresIn: "7d",
         }
