@@ -6,6 +6,7 @@ import bmiRoutes from "./modules/bmi/bmi.route";
 import waterRoutes from "./modules/water/water.route";
 import sleepRoutes from "./modules/sleep/sleep.route";
 import weightRoutes from "./modules/weight/weight.route";
+import goalRoutes from "./modules/goals/goal.route";
 
 
 
@@ -43,5 +44,6 @@ app.use("/api/v1/bmi", bmiRoutes);
 app.use("/api/v1/water", waterRoutes);
 app.use("/api/v1/sleep", sleepRoutes);
 app.use("/api/v1/weight", weightRoutes);
+app.use("/api/v1/goals", goalRoutes);
 
 export default app;
