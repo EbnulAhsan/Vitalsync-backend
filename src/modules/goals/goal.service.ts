@@ -1,4 +1,5 @@
 import { prisma } from "../../config/prisma";
+import AppError from "../../error/AppError";
 
 type GoalType = "WEIGHT" | "WATER" | "SLEEP" | "CALORIES";
 type GoalStatus = "ACTIVE" | "COMPLETED" | "FAILED";
@@ -21,11 +22,11 @@ const createGoal = async (userId: string, payload: CreateGoalPayload) => {
     const targetValue = Number(payload.targetValue);
 
     if (!payload.type) {
-        throw new Error("Goal type is required");
+        throw new AppError(400, "Goal type is required");
     }
 
     if (!targetValue || targetValue <= 0) {
-        throw new Error("Valid targetValue is required");
+        throw new AppError(400, "Valid targetValue is required");
     }
 
     const goal = await prisma.goal.create({
@@ -33,7 +34,8 @@ const createGoal = async (userId: string, payload: CreateGoalPayload) => {
             userId,
             type: payload.type,
             targetValue,
-            currentValue: payload.currentValue ? Number(payload.currentValue) : 0,
+            currentValue:
+                payload.currentValue !== undefined ? Number(payload.currentValue) : 0,
             deadline: payload.deadline ? new Date(payload.deadline) : undefined,
         },
     });
@@ -63,7 +65,7 @@ const getGoalById = async (userId: string, goalId: string) => {
     });
 
     if (!goal) {
-        throw new Error("Goal not found");
+        throw new AppError(404, "Goal not found");
     }
 
     return goal;
@@ -82,7 +84,7 @@ const updateGoal = async (
     });
 
     if (!existingGoal) {
-        throw new Error("Goal not found");
+        throw new AppError(404, "Goal not found");
     }
 
     const updatedGoal = await prisma.goal.update({
@@ -91,9 +93,13 @@ const updateGoal = async (
         },
         data: {
             targetValue:
-                payload.targetValue !== undefined ? Number(payload.targetValue) : undefined,
+                payload.targetValue !== undefined
+                    ? Number(payload.targetValue)
+                    : undefined,
             currentValue:
-                payload.currentValue !== undefined ? Number(payload.currentValue) : undefined,
+                payload.currentValue !== undefined
+                    ? Number(payload.currentValue)
+                    : undefined,
             deadline: payload.deadline ? new Date(payload.deadline) : undefined,
             status: payload.status,
         },
@@ -111,7 +117,7 @@ const deleteGoal = async (userId: string, goalId: string) => {
     });
 
     if (!existingGoal) {
-        throw new Error("Goal not found");
+        throw new AppError(404, "Goal not found");
     }
 
     await prisma.goal.delete({

@@ -1,4 +1,5 @@
 import { prisma } from "../../config/prisma";
+import AppError from "../../error/AppError";
 
 type AddWeightPayload = {
     weightKg: number;
@@ -9,7 +10,7 @@ const addWeight = async (userId: string, payload: AddWeightPayload) => {
     const weightKg = Number(payload.weightKg);
 
     if (!weightKg || weightKg <= 0) {
-        throw new Error("Valid weightKg is required");
+        throw new AppError(400, "Valid weightKg is required");
     }
 
     const weightRecord = await prisma.weightHistory.create({
@@ -47,7 +48,7 @@ const getLatestWeight = async (userId: string) => {
     });
 
     if (!latestWeight) {
-        throw new Error("No weight record found");
+        throw new AppError(404, "No weight record found");
     }
 
     return latestWeight;

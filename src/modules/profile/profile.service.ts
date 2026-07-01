@@ -1,4 +1,5 @@
 import { prisma } from "../../config/prisma";
+import AppError from "../../error/AppError";
 
 type UpdateProfilePayload = {
     fullName?: string;
@@ -25,7 +26,7 @@ const getMyProfile = async (userId: string) => {
     });
 
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError(404, "User not found");
     }
 
     return user;

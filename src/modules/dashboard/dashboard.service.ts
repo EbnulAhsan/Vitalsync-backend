@@ -1,4 +1,5 @@
 import { prisma } from "../../config/prisma";
+import AppError from "../../error/AppError";
 
 const getDashboardSummary = async (userId: string) => {
     const startOfDay = new Date();
@@ -22,7 +23,7 @@ const getDashboardSummary = async (userId: string) => {
     });
 
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError(404, "User not found");
     }
 
     const latestBMI = await prisma.bMIRecord.findFirst({
