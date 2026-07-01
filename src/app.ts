@@ -8,6 +8,8 @@ import sleepRoutes from "./modules/sleep/sleep.route";
 import weightRoutes from "./modules/weight/weight.route";
 import goalRoutes from "./modules/goals/goal.route";
 import dashboardRoutes from "./modules/dashboard/dashboard.route";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler";
+import { notFound } from "./middlewares/notFound";
 
 
 
@@ -47,5 +49,8 @@ app.use("/api/v1/sleep", sleepRoutes);
 app.use("/api/v1/weight", weightRoutes);
 app.use("/api/v1/goals", goalRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
+
+app.use(notFound);
+app.use(globalErrorHandler);
 
 export default app;
