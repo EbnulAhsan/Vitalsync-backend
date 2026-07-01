@@ -1,4 +1,5 @@
 import { prisma } from "../../config/prisma";
+import AppError from "../../error/AppError";
 
 type AddSleepPayload = {
     durationMins: number;
@@ -13,7 +14,7 @@ const addSleep = async (userId: string, payload: AddSleepPayload) => {
     const durationMins = Number(payload.durationMins);
 
     if (!durationMins || durationMins <= 0) {
-        throw new Error("Valid durationMins is required");
+        throw new AppError(400, "Valid durationMins is required");
     }
 
     const sleepRecord = await prisma.sleepHistory.create({
