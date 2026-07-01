@@ -4,6 +4,9 @@ import authRoutes from "./modules/auth/auth.route";
 import profileRoutes from "./modules/profile/profile.route";
 import bmiRoutes from "./modules/bmi/bmi.route";
 import waterRoutes from "./modules/water/water.route";
+import sleepRoutes from "./modules/sleep/sleep.route";
+
+
 
 const app = express();
 
@@ -32,10 +35,11 @@ app.get("/health", (req, res) => {
     });
 });
 
-// API Routes
+// All API Routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/bmi", bmiRoutes);
 app.use("/api/v1/water", waterRoutes);
+app.use("/api/v1/sleep", sleepRoutes);
 
 export default app;
