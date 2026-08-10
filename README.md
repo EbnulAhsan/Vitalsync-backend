@@ -72,7 +72,7 @@ BMI categories:
 ### 💧 Water Tracker Module
 
 - Add water intake
-- Get today’s water total
+- Get today's water total
 - Get water intake history
 - Calculate total water in ml and liters
 
@@ -82,7 +82,7 @@ BMI categories:
 
 - Add sleep duration
 - Add sleep quality
-- Get today’s sleep total
+- Get today's sleep total
 - Get sleep history
 - Convert sleep minutes into hours
 
@@ -130,8 +130,8 @@ Single API endpoint that returns a complete health overview:
 - User profile
 - Latest BMI
 - Latest weight
-- Today’s water intake
-- Today’s sleep duration
+- Today's water intake
+- Today's sleep duration
 - Active goals
 
 ---
@@ -164,6 +164,14 @@ Single API endpoint that returns a complete health overview:
 - catchAsync utility
 - Prisma database client
 - Clean API response format
+
+### DevOps & Infrastructure
+
+- 🐳 **Docker & Docker Compose**
+- ☁️ **AWS EC2 (Ubuntu 24.04)**
+- 🌐 **Nginx Reverse Proxy**
+- 🔧 **Jenkins CI/CD**
+- 🔔 **GitHub Webhooks**
 
 ---
 
@@ -221,6 +229,9 @@ vitalsync-backend
 │
 ├─ .env
 ├─ .gitignore
+├─ Dockerfile
+├─ docker-compose.yml
+├─ Jenkinsfile
 ├─ package.json
 ├─ tsconfig.json
 └─ README.md
@@ -555,8 +566,8 @@ Returns:
 - User profile
 - Latest BMI
 - Latest weight
-- Today’s water total
-- Today’s sleep total
+- Today's water total
+- Today's sleep total
 - Active goals
 
 ---
@@ -720,6 +731,269 @@ JWT_REFRESH_SECRET="your_refresh_secret"
 
 ---
 
+## 🚀 DevOps & Deployment
+
+VitalSync is fully containerized and deployed with a production-style CI/CD pipeline on AWS — covering Dockerization, reverse proxy routing, and automated build-and-deploy on every push.
+
+### 🐳 Dockerization
+
+The backend is fully containerized using Docker.
+
+**Features:**
+
+- Node.js 22 Alpine base image
+- Optimized production build
+- TypeScript compilation at build time
+- Lightweight, isolated runtime environment
+
+**Build the image:**
+
+```bash
+docker build -t vitalsync-backend .
+```
+
+**Run the container:**
+
+```bash
+docker run -d \
+  --name vitalsync-backend \
+  -p 5000:5000 \
+  vitalsync-backend
+```
+
+---
+
+### 🐙 Docker Compose
+
+Docker Compose handles multi-container orchestration for local and production environments.
+
+**Services:**
+
+| Service | Description |
+|---|---|
+| `backend` | Node.js / Express API |
+| `postgres` | PostgreSQL database |
+
+**Start all services:**
+
+```bash
+docker-compose up -d
+```
+
+**Stop all services:**
+
+```bash
+docker-compose down
+```
+
+**Check running containers:**
+
+```bash
+docker ps
+```
+
+---
+
+### ☁️ AWS EC2 Deployment
+
+VitalSync is deployed on an AWS EC2 Ubuntu server.
+
+**Infrastructure stack:**
+
+```txt
+AWS EC2 (Ubuntu 24.04)
+├─ Docker
+├─ Docker Compose
+├─ Nginx
+├─ Jenkins
+└─ PostgreSQL
+```
+
+**Application access:**
+
+| Endpoint | URL |
+|---|---|
+| Frontend | `http://SERVER_IP` |
+| Backend | `http://SERVER_IP/api` |
+| Health Check | `http://SERVER_IP/api/health` |
+
+---
+
+### 🌐 Nginx Reverse Proxy
+
+Nginx sits in front of the stack as a single entry point, routing traffic to the correct service.
+
+**Routing strategy:**
+
+```txt
+/       → Frontend (Next.js)
+/api    → Backend (Node.js)
+```
+
+**Benefits:**
+
+- Single public entry point
+- Clean, consistent URL structure
+- Reverse proxy isolation between services
+- Production-ready request routing
+
+---
+
+### 🔄 CI/CD Pipeline
+
+Continuous Integration and Deployment is implemented with **Jenkins** and **GitHub Webhooks**.
+
+**Pipeline flow:**
+
+```txt
+Developer Push
+   ↓
+GitHub Repository
+   ↓
+GitHub Webhook
+   ↓
+Jenkins Pipeline
+   ↓
+Docker Image Build
+   ↓
+Automatic Deployment
+```
+
+#### 🔧 Jenkins Setup
+
+Jenkins runs inside its own Docker container.
+
+```bash
+docker run -d \
+  --name jenkins \
+  -p 8080:8080 \
+  -p 50000:50000 \
+  jenkins/jenkins:lts-jdk21
+```
+
+Jenkins dashboard: `http://SERVER_IP:8080`
+
+#### 🔔 GitHub Webhook Integration
+
+| Setting | Value |
+|---|---|
+| Webhook URL | `http://SERVER_IP:8080/github-webhook/` |
+| Trigger | Push events |
+
+Every push to GitHub automatically triggers the Jenkins pipeline — no manual deployment needed.
+
+#### 🧾 Jenkinsfile Pipeline Stages
+
+- **Build Stage** — Build Docker image
+- **Deploy Stage** — Stop old container, deploy new container
+
+**Automated deployment flow:**
+
+```txt
+Code Push
+   ↓
+Webhook Trigger
+   ↓
+Jenkins Build
+   ↓
+Docker Build
+   ↓
+Deploy New Container
+```
+
+---
+
+### 📊 Deployment Verification
+
+**Check running containers:**
+
+```bash
+docker ps
+```
+
+Expected containers:
+
+```txt
+jenkins
+vitalsync-postgres
+vitalsync-backend
+vitalsync-frontend
+vitalsync-backend-auto
+```
+
+**Backend health check:**
+
+```bash
+curl http://localhost:5000/health
+```
+
+**Auto-deployed backend health check:**
+
+```bash
+curl http://localhost:5001/health
+```
+
+**Expected response:**
+
+```json
+{
+  "success": true,
+  "status": "healthy"
+}
+```
+
+---
+
+### ✅ DevOps Deliverables Completed
+
+**Infrastructure**
+
+- ✅ AWS EC2 server provisioned
+- ✅ Ubuntu server configuration
+- ✅ Docker installation
+- ✅ Docker Compose setup
+- ✅ Nginx reverse proxy
+
+**Containerization**
+
+- ✅ Backend Dockerization
+- ✅ PostgreSQL containerization
+- ✅ Multi-container deployment
+
+**CI/CD**
+
+- ✅ Jenkins setup
+- ✅ GitHub integration
+- ✅ Jenkinsfile pipeline
+- ✅ GitHub webhook
+- ✅ Automatic build trigger
+- ✅ Docker build automation
+- ✅ Automatic deployment pipeline
+
+**Verification**
+
+- ✅ Frontend live
+- ✅ Backend live
+- ✅ Health check endpoint working
+- ✅ Docker containers running
+- ✅ Jenkins pipeline successful
+
+### 🏆 DevOps Achievements
+
+This project demonstrates a complete production-style DevOps workflow:
+
+- AWS EC2 deployment
+- Docker containerization
+- Docker Compose orchestration
+- Nginx reverse proxy
+- Jenkins automation
+- GitHub webhook integration
+- Continuous Integration (CI)
+- Continuous Deployment (CD)
+- Production-style infrastructure
+
+---
+
 ## 🌐 Frontend Repository
 
 👉 [VitalSync Frontend](https://github.com/EbnulAhsan/)
@@ -736,8 +1010,7 @@ JWT_REFRESH_SECRET="your_refresh_secret"
 - 🔔 Notification/reminder system
 - 📊 Advanced analytics APIs
 - 🧪 Unit and integration tests
-- 🐳 Docker support
-- ☁️ Cloud deployment
+- ☸️ Kubernetes deployment
 
 ---
 
@@ -756,6 +1029,7 @@ Full-stack project built with focus on:
 - REST API architecture
 - Authentication and authorization
 - Clean backend structure
+- DevOps & CI/CD automation
 
 GitHub:  
 👉 [EbnulAhsan](https://github.com/EbnulAhsan/)
