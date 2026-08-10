@@ -2,16 +2,22 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone') {
+        stage('Build Docker Image') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/EbnulAhsan/Vitalsync-backend.git'
+                sh 'docker build -t vitalsync-backend:latest .'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Deploy') {
             steps {
-                sh 'docker build -t vitalsync-backend:jenkins .'
+                sh '''
+                docker rm -f vitalsync-backend-auto || true
+
+                docker run -d \
+                --name vitalsync-backend-auto \
+                -p 5001:5000 \
+                vitalsync-backend:latest
+                '''
             }
         }
     }
